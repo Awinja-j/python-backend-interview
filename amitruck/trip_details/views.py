@@ -2,26 +2,23 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, throttling
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from .models import Trip
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
 class TripDetailsView(APIView):
     throttle_classes = [throttling.UserRateThrottle]
+    authentication_classes = [TokenAuthentication]  # Use Token authentication
+    permission_classes = [IsAuthenticated]  # Ensure user is authenticated
+
 
     @method_decorator(csrf_exempt)  # Disabling CSRF protection for simplicity
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
     def post(self, request):
-        # Authenticate request using api_token parameter
-        api_token = request.query_params.get('api_token')
-        if not api_token:
-            return Response(
-                {'status_code': status.HTTP_403_FORBIDDEN, 'status': 'Forbidden', 'description': 'Unauthorized request.'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
         # Validate input data
         data = request.data
         required_fields = ['driver_id', 'vehicle_id', 'customer_id', 'address', 'cargo_tonnage', 'address_type', 'done_by_user_id']

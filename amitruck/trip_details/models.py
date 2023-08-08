@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class User(models.Model):
     USER_TYPE_CHOICES = [
         ('customer', 'Customer'),
